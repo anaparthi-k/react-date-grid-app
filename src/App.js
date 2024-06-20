@@ -131,8 +131,6 @@ function App() {
     },
   ];
 
-  // const currentYear = 2024;
-
   const getMonths = (tasks, year) => {
     const months = new Set();
     tasks.forEach((task) => {
@@ -140,58 +138,22 @@ function App() {
       if (start.getFullYear() !== year) {
         return;
       }
-      // console.log("[start]", start);
       months.add(start.getMonth());
     });
     return [...months];
   };
 
   const getTasksByMonth = (tasks, month) => {
-    // Date.parse("01/01/2024");
-    // console.log("[month]", month);
-    // console.log("[tasks]", tasks);
     const currentTasks = tasks.filter((task) => {
       const start = new Date(task.start_date);
-      // const end = new Date(task.end_date);
       return start.getMonth() === month;
     });
 
     currentTasks.sort(
       (a, b) => new Date(a.start_date) - new Date(b.start_date)
     );
-
-    // console.log("[filtered tasks]", currentTasks);
     return currentTasks;
   };
-
-  // function formatDate(inputDate, format) {
-  //   if (!inputDate) return "";
-  //   const padZero = (value) => (value < 10 ? `0${value}` : `${value}`);
-  //   const parts = {
-  //     yyyy: inputDate.getFullYear(),
-  //     MM: padZero(inputDate.getMonth() + 1),
-  //     dd: padZero(inputDate.getDate()),
-  //     HH: padZero(inputDate.getHours()),
-  //     hh: padZero(
-  //       inputDate.getHours() > 12 ? inputDate.getHours() - 12 : inputDate.getHours()
-  //     ),
-  //     mm: padZero(inputDate.getMinutes()),
-  //     ss: padZero(inputDate.getSeconds()),
-  //     tt: inputDate.getHours() < 12 ? "AM" : "PM",
-  //   };
-
-  //   return format.replace(
-  //     /yyyy|MM|dd|HH|hh|mm|ss|tt/g,
-  //     (match) => parts[match]
-  //   );
-  // }
-
-  // const convertToDate = (dateString) => {
-  //    formatDate(new Date(dateString), "yyyy-MM-dd HH:mm:ss tt");
-  //   // const options = { year: 'numeric', month: '2-digit', day: '2-digit' }; // Example format
-  //   // Intl.DateTimeFormat('en-US', options).format(new Date(dateString));
-  //   // date.toLocaleDateString('en-US', options)
-  // };
 
   // Write a method get all dates in a month
 
@@ -214,11 +176,9 @@ function App() {
 
   const getAllDatesInMonth = (year, month) => {
     let dates = [];
-    // Create a date object at the start of the month
     let date = new Date(year, month, 1);
-    // While the month is the same, add the date to the array and increment the day
     while (date.getMonth() === month) {
-      dates.push(new Date(date).getDate()); // Clone the date object to avoid mutations
+      dates.push(new Date(date).getDate());
       date.setDate(date.getDate() + 1);
     }
     return dates;
@@ -249,7 +209,6 @@ function App() {
   };
 
   const getTaskNames = (tasks) => {
-    // console.log("[current tasks]", tasks);
     const taskNames = new Set();
     tasks.forEach((task) => {
       taskNames.add(task.title);
@@ -267,32 +226,15 @@ function App() {
     const month = currentMonth;
 
     let dateSpans = [];
-    // Create a date object at the start of the month
     let currentDate = new Date(year, month, 1);
-    // While the month is the same, add the date to the array and increment the day
     let taskIndex = 0;
-
-    // const spanLogs = [];
-
-    // console.log("[Task Name]", taskName, "[tasks]", tasks);
-
     while (currentDate.getMonth() === month) {
       let span = 1;
       let task = tasks[taskIndex];
 
       if (isDateFallsInTaskStartAndEndDates(currentDate, task)) {
-        // console.log("Adding span for task");
-        // console.log(
-        //   "[currentDate]",
-        //   currentDate,
-        //   "[startDate]",
-        //   startDate,
-        //   "[endDate]",
-        //   endDate
-        // );
         span = getDatesDiffInDays(task.start_date, task.end_date);
         span = Math.min(span + 1, currentMonthDates.length);
-        // console.log("[task]", task, "[span]", span);
         dateSpans.push(
           <td
             key={dateSpans.length}
@@ -301,25 +243,19 @@ function App() {
           ></td>
         );
         taskIndex++;
-        // spanLogs.push(span);
       } else {
-        // spanLogs.push(1);
         dateSpans.push(<td key={dateSpans.length}></td>);
       }
 
-      // console.log("[date]", currentDate, "[task]", task, "[span]", span);
       currentDate.setDate(currentDate.getDate() + span);
     }
 
-    // console.log("[dateSpans]", dateSpans);
-    // console.log("task", taskName, "[spanLogs]", spanLogs);
     return dateSpans;
   };
 
   const monthIndexNames = getMonthIndexNameMap();
   const [currentYear] = useState(2024);
   const months = getMonths(currentTasks, currentYear);
-  // console.log("[months]", months);
   const [currentMonth, setCurrentMonth] = useState(months[0]);
   const [currentMonthDates, setCurrentMonthDates] = useState(() =>
     getAllDatesInMonth(currentYear, currentMonth)
@@ -333,13 +269,9 @@ function App() {
 
   const handleMonthChange = (event) => {
     const month = +event.target.value;
-    console.log("[month]", month);
     const datesInMonth = getAllDatesInMonth(currentYear, month);
     const filteredTasksByMonth = getTasksByMonth(currentTasks, month);
     const filteredTasks = getTaskNames(filteredTasksByMonth);
-
-    // console.log("datesInMonth", datesInMonth,"[filteredTasksByMonth]", filteredTasksByMonth,"[filteredTasks]", filteredTasks);
-
     setCurrentMonth(month);
     setCurrentMonthDates(datesInMonth);
     setCurrentMonthTasks(filteredTasksByMonth);
