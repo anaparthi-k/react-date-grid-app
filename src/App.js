@@ -1,5 +1,5 @@
 import "./style.css";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 function App() {
   const currentTasks = [
@@ -131,16 +131,15 @@ function App() {
     },
   ];
 
-  const getMonths = (tasks, year) => {
+  const getYearMonths = (tasks) => {
+    let year = 0;
     const months = new Set();
     tasks.forEach((task) => {
       const start = new Date(task.start_date);
-      if (start.getFullYear() !== year) {
-        return;
-      }
+      year = start.getFullYear()
       months.add(start.getMonth());
     });
-    return [...months];
+    return {year, months:[...months]};
   };
 
   const getTasksByMonth = (tasks, month) => {
@@ -254,18 +253,13 @@ function App() {
   };
 
   const monthIndexNames = getMonthIndexNameMap();
-  const [currentYear] = useState(2024);
-  const months = getMonths(currentTasks, currentYear);
+  const yearOfMonths = getYearMonths(currentTasks);
+  const [currentYear] = useState(yearOfMonths.year);
+  const months = yearOfMonths.months;
   const [currentMonth, setCurrentMonth] = useState(months[0]);
-  const [currentMonthDates, setCurrentMonthDates] = useState(() =>
-    getAllDatesInMonth(currentYear, currentMonth)
-  );
-  const [currentMonthTasks, setCurrentMonthTasks] = useState(() =>
-    getTasksByMonth(currentTasks, currentMonth)
-  );
-  const [currentMonthTaskNames, setCurrentMonthTaskNames] = useState(() =>
-    getTaskNames(currentMonthTasks)
-  );
+  const [currentMonthDates, setCurrentMonthDates] = useState([]);
+  const [currentMonthTasks, setCurrentMonthTasks] = useState([]);
+  const [currentMonthTaskNames, setCurrentMonthTaskNames] = useState([]);
 
   const handleMonthChange = (event) => {
     const month = +event.target.value;
@@ -278,6 +272,10 @@ function App() {
     setCurrentMonthTaskNames(filteredTasks);
   };
 
+  useEffect(()=>{
+    handleMonthChange({target:{value:currentMonth}})
+  },[])
+  
   return (
     <div className="App">
       <h1>Grid App</h1>
